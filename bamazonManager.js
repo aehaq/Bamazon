@@ -15,13 +15,13 @@ var connection = mysql.createConnection({
 // connects to the database
 connection.connect(function(err) {
     if (err) throw err;
-    // console.log("connected as id " + connection.threadId);
-    // Once connection is succesful, begins the shopping experience.
+    // Once connection is succesful, begins the management experience.
     console.log("What would you like to do?\n")
+    // Runs Management function
     manage();
 })
 
-
+// Provides the user with various management options
 function manage() {
     inquirer.prompt([
         {
@@ -31,6 +31,7 @@ function manage() {
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
         }
     ]).then(function(response) {
+        // Depending on the user's choice, will run the correspondinf function.
         switch(response.task) {
             case "View Products for Sale":
                 return displayShop();
@@ -45,42 +46,49 @@ function manage() {
 }
 
 function displayShop() {
+    // creates the table using the cli-table node package.
     var table = new Table({
-        // product_name, department_name, price, stock_quantity
         head: ["ID", "Product", "Department", "Price", "Stock"]
     })
     var query = connection.query('SELECT * FROM products', function (err, res) {
-        // console.log(res[0].item_id)
+        // Pushes each set of values in a given row into the array, does this for every row.
         for (let i = 0; i < res.length; i++) {
             var item = res[i];
             table.push(
                 [item.item_id, item.product_name, item.department_name, item.price+ " G", item.stock_quantity]
             )  
         }
+        // Displays the table
         console.log(table.toString())
+        // Check if User wants to continue.
         continueQuery();
     })
 }
 
 function displayLow() {
     var table = new Table({
-        // product_name, department_name, price, stock_quantity
         head: ["ID", "Product", "Department", "Price", "Stock"]
     })
     var query = connection.query('SELECT * FROM products', function (err, res) {
+        // Pushes each set of values in a given row into the array.
         for (let i = 0; i < res.length; i++) {
             var item = res[i];
+            // Only does so for items with a lower quantity
             if (item.stock_quantity < 5) {
                 table.push(
                     [item.item_id, item.product_name, item.department_name, item.price+ " G", item.stock_quantity]
                 )  
             }
         }
+        // Displays the table
         console.log(table.toString())
+        // Checks if User wants to continue.
         continueQuery();
     })
 }
 
+// This function asks the user what item and how much they are going to restock. 
+// Then calls the function to restock.
 function addInventory() {
     inquirer.prompt([
         {
@@ -92,10 +100,12 @@ function addInventory() {
             name: "quantity"
         }
     ]).then(function(response) {
-
+        // Saves the quantity requested for later use.
         var quant = parseInt(response.quantity);
+        // Creates a variable for the item's position in the array based off of it's number.
         var itemNum = parseInt(response.item) - 1;
 
+        // Retrieves information regarding the relevant item. 
         var query = connection.query('SELECT * FROM products', function (err, res) {
             var item = res[itemNum];
             var stock = parseInt(item.stock_quantity);
@@ -103,14 +113,17 @@ function addInventory() {
             if (!item) {
                 console.log("I'm sorry, but no item with that ID exists. \n");
             } else {
+                // Runs the increase Stock function with necessary information.
                 increaseStock(item, stock, quant);
             }
-
         })
-
     });
 }
 
+// This function takes in the following information:
+// item, which is the item object containing the necessary information
+// stock, which is the current stock of the relevant item.
+// quant, which is the quantity we are adding to the stock.
 function increaseStock(item, stock, quant) {
     var newQuant = stock + quant;
     var id = item.item_id;
@@ -125,11 +138,14 @@ function increaseStock(item, stock, quant) {
     ],
     function(err, res) {
         console.log("Stock succesfully increased")
+        // Checks if User wants to continue.
         continueQuery();
     }
     );
 }
 
+
+// This function asks the user for all the pertinent information regarding the new product, and adds it to the database accordingly.
 function addProduct() {
     console.log("Function Start")
     inquirer.prompt([
@@ -150,15 +166,19 @@ function addProduct() {
             name: "stock"
         }
     ]).then(function(res) {
+        // Takes all of the data input and turns them into correctly formatted variables.
         var product = res.product;
         var department = res.department;
         var price = parseInt(res.price);
         var stock = parseInt(res.stock);
 
+        // Checks to see if there were any problems converting the intergers
         if (!price || !stock) {
             console.log("Make sure you only type a number for the price and stock");
+            // Checks if User wants to continue.
             continueQuery();
         } else {
+            // If no problems exist, inserts a new product into the table with the new data.
             var query= connection.query(
                 "INSERT INTO products SET ?",
                 {
@@ -169,6 +189,7 @@ function addProduct() {
                 },
                 function(err, res) {
                     console.log("Succesfully added the new Item")
+                    // Checks if User wants to continue.
                     continueQuery();
                 }
             )
@@ -176,6 +197,7 @@ function addProduct() {
     });
 }
 
+// This function is run to see if the user would like to continue managing.
 function continueQuery() {
     inquirer.prompt([
         {
@@ -185,8 +207,10 @@ function continueQuery() {
         }
     ]).then(function(res) {
         if (res.continue) {
+            // Return to original menu if yes.
             manage();
         } else {
+            // End connection if No.
             console.log("Thank you for your service, \n Have a nice day!")
             connection.end();
         }

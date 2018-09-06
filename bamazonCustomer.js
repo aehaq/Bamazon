@@ -23,25 +23,26 @@ connection.connect(function(err) {
 
 
 function displayShop() {
+    // creates the table using the cli-table node package.
     var table = new Table({
-        // product_name, department_name, price, stock_quantity
         head: ["ID", "Product", "Department", "Price", "Stock"]
     })
     var query = connection.query('SELECT * FROM products', function (err, res) {
-        // console.log(res[0].item_id)
+        // Pushes each set of values in a given row into the array, does this for every row.
         for (let i = 0; i < res.length; i++) {
             var item = res[i];
             table.push(
                 [item.item_id, item.product_name, item.department_name, item.price+ " G", item.stock_quantity]
             )  
         }
+        // Finalize table Display and prints to terminal.
         console.log(table.toString())
         // We run the shopping function with reference to the data we just pulled.
         beginShopping(res);
     })
 }
 
-
+// This function stores all the table data gathered when the shop was displayed as an argument, and then asks the user about their purchase.
 function beginShopping(data) {
     inquirer.prompt([
         {
@@ -53,22 +54,27 @@ function beginShopping(data) {
             name: "quantity"
         }
     ]).then(function(response) {
+        // Gather and format data pertinent to the request.
         var itemNum = parseInt(response.item);
         var quant = parseInt(response.quantity);
         var item = data[itemNum - 1];
         var stock = parseInt(item.stock_quantity);
 
         if (!item) {
+            // If the user referred to an item that isn't in the table.
             console.log("I'm sorry, but it turns out that no Item with that ID exists. \n");
             continueQuery();
         } else {
             if (stock === 0) {
+                // If the item is out of stock
                 console.log("Oh my, I guess we ran out of those... So, sorry. \n");
                 continueQuery();
             } else if (stock < quant) {
+                // if the user asks for more of the item than is available
                 console.log("Oh, sorry, it looks like we don't have enough in stock to fulfill your order. \n");
                 continueQuery();
             } else {
+                // If no problems exist, calls the function that handles the purchase.
                 makePurchase(item, stock, quant);
             }
         }
@@ -76,10 +82,17 @@ function beginShopping(data) {
     });
 }
 
+// This function takes in the following information:
+// item, which is the item object containing the necessary information
+// stock, which is the current stock of the relevant item.
+// quant, which is the quantity we are adding to the stock.
 function makePurchase(item, stock, quant) {
+    // Sets a new quantity for the stock after the quantity is reduced.
     var newQuant = stock - quant;
     var cost = quant * item.price;
     var id = item.item_id;
+
+    // Update the quantity based off of the newly calculated quantity.
     var query = connection.query('UPDATE products SET ? WHERE ?',
     [
         {
@@ -91,6 +104,7 @@ function makePurchase(item, stock, quant) {
     ],
     function(err, res) {
         console.log("Great, That'll be "+cost+" G... \nThanks for the Purchase!")
+        // Check if user would like to continue
         continueQuery();
     }
     );
