@@ -60,6 +60,7 @@ function beginShopping(data) {
 
         if (!item) {
             console.log("I'm sorry, but it turns out that no Item with that ID exists. \n");
+            continueQuery();
         } else {
             if (stock === 0) {
                 console.log("Oh my, I guess we ran out of those... So, sorry. \n");
