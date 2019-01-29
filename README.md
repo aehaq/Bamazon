@@ -9,7 +9,7 @@ Bamazon is a text based shop simulator and manager running entirely on the backe
 # Installation guide
 - First you will need to download this folder to your computer. You may do this either by downloading the document as a zip file, or by cloning the git repository to a folder on your computer using Git Bash. In order to do this, click the green button labeled "Clone or Download", and select your method of retrieving the file.
 - If you want to use the git clone method, your first step is to copy the link provided. From here you want to navigate to the desired location on your computer in your Git Bash terminal, or navigate to the desired location via your explorer, right click and select "Git Bash Here". Within your Git Bash terminal, type the following: 
-`git clone https://github.com/aehaq/Bamazon.git`
+`git clone https://github.com/aehaq/Fantasy-Shop.git`
 - Once the repository exists locally on your computer, navigate to within the newly downloaded folder using git bash, or use the "Git Bash Here" method to open the terminal within the correct folder.
 - To ensure you are in the correct folder, type the following and hit enter: 
 `ls`
