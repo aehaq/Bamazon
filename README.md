@@ -1,5 +1,5 @@
-# Bamazon
-Bamazon is a text based shop simulator and manager running entirely on the backend using Node, and handling inventory using MySQL. This rendition of Bamazon has two modes, Bamazon Customer and Bamazon Manager. The former can be used to purchase items from the store, and the latter can be used to manage the store's inventory.
+# Fantasy Shop
+Bamazon is a text based shop simulator and manager running entirely on the backend using Node, and handling inventory using MySQL. This rendition of the Fantasy Shop has two modes, Shop Customer and Shop Manager. The former can be used to purchase items from the store, and the latter can be used to manage the store's inventory.
 
 # Prerequisites
 - [node.js](https://nodejs.org/en/)
